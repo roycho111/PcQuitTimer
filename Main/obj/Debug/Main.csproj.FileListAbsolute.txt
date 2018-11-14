@@ -1,0 +1,10 @@
+C:\Users\jhcho\Desktop\MyWork\AutoShutdown\Main\bin\Debug\Main.exe.config
+C:\Users\jhcho\Desktop\MyWork\AutoShutdown\Main\bin\Debug\Main.exe
+C:\Users\jhcho\Desktop\MyWork\AutoShutdown\Main\bin\Debug\Main.pdb
+C:\Users\jhcho\Desktop\MyWork\AutoShutdown\Main\obj\Debug\Main.csprojAssemblyReference.cache
+C:\Users\jhcho\Desktop\MyWork\AutoShutdown\Main\obj\Debug\Main.Form1.resources
+C:\Users\jhcho\Desktop\MyWork\AutoShutdown\Main\obj\Debug\Main.Properties.Resources.resources
+C:\Users\jhcho\Desktop\MyWork\AutoShutdown\Main\obj\Debug\Main.csproj.GenerateResource.cache
+C:\Users\jhcho\Desktop\MyWork\AutoShutdown\Main\obj\Debug\Main.csproj.CoreCompileInputs.cache
+C:\Users\jhcho\Desktop\MyWork\AutoShutdown\Main\obj\Debug\Main.exe
+C:\Users\jhcho\Desktop\MyWork\AutoShutdown\Main\obj\Debug\Main.pdb
