@@ -1,0 +1,265 @@
+<Window x:Class="PcQuitTimer.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:converters="clr-namespace:PcQuitTimer.Converters"
+        xmlns:models="clr-namespace:PcQuitTimer.Models"
+        mc:Ignorable="d"
+        Title="PC Quit Timer"
+        Height="520" Width="480"
+        ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterScreen"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{materialDesign:MaterialDesignFont}">
+
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
+        <converters:EnumBooleanConverter x:Key="EnumBool" />
+    </Window.Resources>
+
+    <materialDesign:Card Margin="16" Padding="0">
+        <TabControl materialDesign:NavigationRailAssist.ShowSelectionBackground="True"
+                    Style="{StaticResource MaterialDesignNavigationRailTabControl}">
+
+            <!-- Timer Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="Timer" Width="24" Height="24" HorizontalAlignment="Center" />
+                        <TextBlock Text="Timer" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,16">
+                    <StackPanel>
+                        <!-- Timer Mode Selection -->
+                        <TextBlock Text="Timer Mode" Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Margin="0,0,0,8" />
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                            <RadioButton Content="Countdown"
+                                         IsChecked="{Binding SelectedTimerMode, Converter={StaticResource EnumBool}, ConverterParameter=Countdown}"
+                                         Style="{StaticResource MaterialDesignTabRadioButtonBottom}"
+                                         Margin="0,0,8,0" />
+                            <RadioButton Content="Specific Time"
+                                         IsChecked="{Binding SelectedTimerMode, Converter={StaticResource EnumBool}, ConverterParameter=SpecificTime}"
+                                         Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
+                        </StackPanel>
+
+                        <!-- Countdown Input -->
+                        <StackPanel Visibility="{Binding SelectedTimerMode, Converter={StaticResource EnumBool}, ConverterParameter=Countdown}">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedTimerMode}" Value="{x:Static models:TimerMode.Countdown}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
+                                <StackPanel Margin="0,0,12,0">
+                                    <TextBlock Text="Hours" HorizontalAlignment="Center" Margin="0,0,0,4"
+                                               Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                    <TextBox Text="{Binding Hours, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="70" HorizontalContentAlignment="Center"
+                                             Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                                </StackPanel>
+                                <TextBlock Text=":" VerticalAlignment="Bottom" Margin="0,0,12,12"
+                                           Style="{StaticResource MaterialDesignHeadline5TextBlock}" />
+                                <StackPanel Margin="0,0,12,0">
+                                    <TextBlock Text="Minutes" HorizontalAlignment="Center" Margin="0,0,0,4"
+                                               Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                    <TextBox Text="{Binding Minutes, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="70" HorizontalContentAlignment="Center"
+                                             Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                                </StackPanel>
+                                <TextBlock Text=":" VerticalAlignment="Bottom" Margin="0,0,12,12"
+                                           Style="{StaticResource MaterialDesignHeadline5TextBlock}" />
+                                <StackPanel>
+                                    <TextBlock Text="Seconds" HorizontalAlignment="Center" Margin="0,0,0,4"
+                                               Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                    <TextBox Text="{Binding Seconds, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="70" HorizontalContentAlignment="Center"
+                                             Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Specific Time Input -->
+                        <StackPanel>
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedTimerMode}" Value="{x:Static models:TimerMode.SpecificTime}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
+                                <DatePicker SelectedDate="{Binding TargetDate}"
+                                            materialDesign:HintAssist.Hint="Date"
+                                            Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                                            Width="140" Margin="0,0,12,0" />
+                                <StackPanel Margin="0,0,8,0">
+                                    <TextBlock Text="Hour" HorizontalAlignment="Center" Margin="0,0,0,4"
+                                               Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                    <TextBox Text="{Binding TargetHour, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="60" HorizontalContentAlignment="Center"
+                                             Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                                </StackPanel>
+                                <TextBlock Text=":" VerticalAlignment="Bottom" Margin="0,0,8,12"
+                                           Style="{StaticResource MaterialDesignHeadline5TextBlock}" />
+                                <StackPanel>
+                                    <TextBlock Text="Min" HorizontalAlignment="Center" Margin="0,0,0,4"
+                                               Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                    <TextBox Text="{Binding TargetMinute, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="60" HorizontalContentAlignment="Center"
+                                             Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Power Action -->
+                        <TextBlock Text="Action" Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Margin="0,0,0,8" />
+                        <ComboBox ItemsSource="{Binding PowerActions}"
+                                  SelectedItem="{Binding SelectedPowerAction}"
+                                  Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                  Margin="0,0,0,24" />
+
+                        <!-- Remaining Time Display -->
+                        <TextBlock Text="{Binding RemainingTime}"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource MaterialDesignHeadline3TextBlock}"
+                                   Margin="0,0,0,8" />
+
+                        <ProgressBar Value="{Binding Progress}"
+                                     Height="6" Margin="0,0,0,24"
+                                     Style="{StaticResource MaterialDesignLinearProgressBar}" />
+
+                        <!-- Buttons -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="START" Command="{Binding StartTimerCommand}"
+                                    Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"
+                                    Width="140" Height="40" Margin="0,0,12,0" />
+                            <Button Content="STOP" Command="{Binding StopTimerCommand}"
+                                    Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
+                                    Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}"
+                                    Width="140" Height="40" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Schedule Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="CalendarClock" Width="24" Height="24" HorizontalAlignment="Center" />
+                        <TextBlock Text="Schedule" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+
+                <Grid Margin="24,16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Add Schedule -->
+                    <StackPanel Grid.Row="0">
+                        <TextBlock Text="New Schedule" Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Margin="0,0,0,12" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <StackPanel Margin="0,0,8,0">
+                                <TextBlock Text="Hour" HorizontalAlignment="Center" Margin="0,0,0,4"
+                                           Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                <TextBox Text="{Binding ScheduleHour, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="60" HorizontalContentAlignment="Center"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                            </StackPanel>
+                            <TextBlock Text=":" VerticalAlignment="Bottom" Margin="0,0,8,12"
+                                       Style="{StaticResource MaterialDesignHeadline5TextBlock}" />
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="Min" HorizontalAlignment="Center" Margin="0,0,0,4"
+                                           Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                <TextBox Text="{Binding ScheduleMinute, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="60" HorizontalContentAlignment="Center"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                            </StackPanel>
+                            <ComboBox ItemsSource="{Binding PowerActions}"
+                                      SelectedItem="{Binding ScheduleAction}"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                      Width="120" />
+                        </StackPanel>
+
+                        <!-- Day checkboxes -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <CheckBox Content="Mon" IsChecked="{Binding ScheduleMon}" Margin="0,0,4,0" />
+                            <CheckBox Content="Tue" IsChecked="{Binding ScheduleTue}" Margin="0,0,4,0" />
+                            <CheckBox Content="Wed" IsChecked="{Binding ScheduleWed}" Margin="0,0,4,0" />
+                            <CheckBox Content="Thu" IsChecked="{Binding ScheduleThu}" Margin="0,0,4,0" />
+                            <CheckBox Content="Fri" IsChecked="{Binding ScheduleFri}" Margin="0,0,4,0" />
+                            <CheckBox Content="Sat" IsChecked="{Binding ScheduleSat}" Margin="0,0,4,0" />
+                            <CheckBox Content="Sun" IsChecked="{Binding ScheduleSun}" />
+                        </StackPanel>
+
+                        <Button Content="ADD SCHEDULE" Command="{Binding AddScheduleCommand}"
+                                Style="{StaticResource MaterialDesignRaisedButton}"
+                                HorizontalAlignment="Left" Margin="0,0,0,16" />
+
+                        <Separator Margin="0,0,0,12" />
+                    </StackPanel>
+
+                    <!-- Schedule List -->
+                    <ListView Grid.Row="1" ItemsSource="{Binding Schedules}"
+                              HorizontalContentAlignment="Stretch">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <materialDesign:Card Padding="12" Margin="0,0,0,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Time, StringFormat='{}{0:HH:mm}'}"
+                                                           Style="{StaticResource MaterialDesignHeadline6TextBlock}" Margin="0,0,12,0" />
+                                                <TextBlock Text="{Binding Action}"
+                                                           VerticalAlignment="Center"
+                                                           Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                           Foreground="{DynamicResource MaterialDesignBodyLight}" />
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding DaysDisplay}"
+                                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+                                        </StackPanel>
+                                        <ToggleButton Grid.Column="1" IsChecked="{Binding IsEnabled}"
+                                                      Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                                      VerticalAlignment="Center" Margin="0,0,8,0"
+                                                      Command="{Binding DataContext.ToggleScheduleCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                      CommandParameter="{Binding}" />
+                                        <Button Grid.Column="2"
+                                                Style="{StaticResource MaterialDesignIconButton}"
+                                                Command="{Binding DataContext.RemoveScheduleCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                CommandParameter="{Binding}"
+                                                VerticalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="Delete" />
+                                        </Button>
+                                    </Grid>
+                                </materialDesign:Card>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </materialDesign:Card>
+</Window>

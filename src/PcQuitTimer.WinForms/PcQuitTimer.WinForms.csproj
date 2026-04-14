@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net481</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>PcQuitTimer</AssemblyName>
+    <RootNamespace>PcQuitTimer</RootNamespace>
+    <ApplicationIcon />
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+</Project>
