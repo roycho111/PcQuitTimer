@@ -15,9 +15,9 @@ public class MainForm : Form
     private DateTimePicker _dtpDate, _dtpTime;
     private Panel _panelCountdown, _panelSpecific;
     private ComboBox _cboAction;
-    private Label _lblRemaining;
+    private Label _lblRemaining, _lblHours, _lblMinutes, _lblSeconds, _lblAction;
     private ProgressBar _progressBar;
-    private Button _btnStart, _btnStop;
+    private Button _btnStart, _btnStop, _btnLang;
 
     // Schedule tab controls
     private NumericUpDown _nudSchHour, _nudSchMinute;
@@ -25,6 +25,7 @@ public class MainForm : Form
     private CheckBox _chkMon, _chkTue, _chkWed, _chkThu, _chkFri, _chkSat, _chkSun;
     private ListBox _lstSchedules;
     private Button _btnAddSchedule, _btnRemoveSchedule, _btnToggleSchedule;
+    private Label _lblSchTime;
 
     // State
     private readonly Timer _countdownTimer = new();
@@ -40,6 +41,8 @@ public class MainForm : Form
         InitializeScheduleTab();
         SetupTimers();
         LoadSchedules();
+
+        Strings.LanguageChanged += ApplyLanguage;
     }
 
     private void InitializeForm()
@@ -49,7 +52,7 @@ public class MainForm : Form
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
-        Font = new Font("맑은 고딕", 9F);
+        Font = new Font("Segoe UI", 9F);
 
         _tabControl = new TabControl
         {
@@ -60,14 +63,27 @@ public class MainForm : Form
 
     private void InitializeTimerTab()
     {
-        var timerTab = new TabPage("타이머");
+        var timerTab = new TabPage(Strings.TabTimer);
         _tabControl.TabPages.Add(timerTab);
 
         var y = 15;
 
+        // Language toggle button (top-right)
+        _btnLang = new Button
+        {
+            Text = Strings.LangToggle,
+            Location = new Point(370, y),
+            Size = new Size(40, 25),
+            FlatStyle = FlatStyle.Flat,
+            Font = new Font("Segoe UI", 8F, FontStyle.Bold)
+        };
+        _btnLang.FlatAppearance.BorderColor = Color.Gray;
+        _btnLang.Click += (_, _) => Strings.SetKorean(!Strings.IsKorean);
+        timerTab.Controls.Add(_btnLang);
+
         // Timer mode
-        _rbCountdown = new RadioButton { Text = "카운트다운", Location = new Point(20, y), AutoSize = true, Checked = true };
-        _rbSpecificTime = new RadioButton { Text = "날짜/시간 지정", Location = new Point(140, y), AutoSize = true };
+        _rbCountdown = new RadioButton { Text = Strings.Countdown, Location = new Point(20, y), AutoSize = true, Checked = true };
+        _rbSpecificTime = new RadioButton { Text = Strings.SpecificTime, Location = new Point(140, y), AutoSize = true };
         _rbCountdown.CheckedChanged += (_, _) => ToggleTimerMode();
         timerTab.Controls.AddRange(new Control[] { _rbCountdown, _rbSpecificTime });
 
@@ -78,11 +94,14 @@ public class MainForm : Form
         _nudHours = CreateNumericUpDown(0, 0, 99, 70);
         _nudMinutes = CreateNumericUpDown(80, 0, 59, 70);
         _nudSeconds = CreateNumericUpDown(160, 0, 59, 70);
+        _lblHours = new Label { Text = Strings.Hours, Location = new Point(42, 25), AutoSize = true };
+        _lblMinutes = new Label { Text = Strings.Minutes, Location = new Point(107, 25), AutoSize = true };
+        _lblSeconds = new Label { Text = Strings.Seconds, Location = new Point(195, 25), AutoSize = true };
         _panelCountdown.Controls.AddRange(new Control[]
         {
-            _nudHours, new Label { Text = "시간", Location = new Point(42, 25), AutoSize = true },
-            _nudMinutes, new Label { Text = "분", Location = new Point(107, 25), AutoSize = true },
-            _nudSeconds, new Label { Text = "초", Location = new Point(195, 25), AutoSize = true }
+            _nudHours, _lblHours,
+            _nudMinutes, _lblMinutes,
+            _nudSeconds, _lblSeconds
         });
         timerTab.Controls.Add(_panelCountdown);
 
@@ -96,10 +115,11 @@ public class MainForm : Form
         y += 55;
 
         // Action
-        timerTab.Controls.Add(new Label { Text = "동작:", Location = new Point(20, y + 3), AutoSize = true });
+        _lblAction = new Label { Text = Strings.Action, Location = new Point(20, y + 3), AutoSize = true };
+        timerTab.Controls.Add(_lblAction);
         _cboAction = new ComboBox
         {
-            Location = new Point(65, y),
+            Location = new Point(80, y),
             Width = 120,
             DropDownStyle = ComboBoxStyle.DropDownList
         };
@@ -114,7 +134,7 @@ public class MainForm : Form
         _lblRemaining = new Label
         {
             Text = "00:00:00",
-            Font = new Font("맑은 고딕", 36F, FontStyle.Bold),
+            Font = new Font("Segoe UI", 36F, FontStyle.Bold),
             TextAlign = ContentAlignment.MiddleCenter,
             Location = new Point(20, y),
             Size = new Size(400, 70)
@@ -137,7 +157,7 @@ public class MainForm : Form
         // Buttons
         _btnStart = new Button
         {
-            Text = "시작",
+            Text = Strings.Start,
             Location = new Point(130, y),
             Size = new Size(90, 35),
             BackColor = Color.FromArgb(33, 150, 243),
@@ -149,7 +169,7 @@ public class MainForm : Form
 
         _btnStop = new Button
         {
-            Text = "중지",
+            Text = Strings.Stop,
             Location = new Point(230, y),
             Size = new Size(90, 35),
             BackColor = Color.FromArgb(244, 67, 54),
@@ -165,23 +185,24 @@ public class MainForm : Form
 
     private void InitializeScheduleTab()
     {
-        var scheduleTab = new TabPage("반복 예약");
+        var scheduleTab = new TabPage(Strings.TabSchedule);
         _tabControl.TabPages.Add(scheduleTab);
 
         var y = 15;
 
         // Time input
-        scheduleTab.Controls.Add(new Label { Text = "시간:", Location = new Point(20, y + 3), AutoSize = true });
-        _nudSchHour = CreateNumericUpDown(60, 23, 23, 55, y);
-        scheduleTab.Controls.Add(new Label { Text = ":", Location = new Point(120, y + 3), AutoSize = true });
-        _nudSchMinute = CreateNumericUpDown(133, 0, 59, 55, y);
+        _lblSchTime = new Label { Text = Strings.Time, Location = new Point(20, y + 3), AutoSize = true };
+        scheduleTab.Controls.Add(_lblSchTime);
+        _nudSchHour = CreateNumericUpDown(70, 23, 23, 55, y);
+        scheduleTab.Controls.Add(new Label { Text = ":", Location = new Point(130, y + 3), AutoSize = true });
+        _nudSchMinute = CreateNumericUpDown(143, 0, 59, 55, y);
         scheduleTab.Controls.Add(_nudSchHour);
         scheduleTab.Controls.Add(_nudSchMinute);
 
         // Action
         _cboSchAction = new ComboBox
         {
-            Location = new Point(200, y),
+            Location = new Point(210, y),
             Width = 100,
             DropDownStyle = ComboBoxStyle.DropDownList
         };
@@ -194,22 +215,22 @@ public class MainForm : Form
 
         // Day checkboxes
         var dayX = 20;
-        _chkMon = AddDayCheckBox(scheduleTab, "월", dayX, y, true); dayX += 50;
-        _chkTue = AddDayCheckBox(scheduleTab, "화", dayX, y, true); dayX += 50;
-        _chkWed = AddDayCheckBox(scheduleTab, "수", dayX, y, true); dayX += 50;
-        _chkThu = AddDayCheckBox(scheduleTab, "목", dayX, y, true); dayX += 50;
-        _chkFri = AddDayCheckBox(scheduleTab, "금", dayX, y, true); dayX += 50;
-        _chkSat = AddDayCheckBox(scheduleTab, "토", dayX, y, false); dayX += 50;
-        _chkSun = AddDayCheckBox(scheduleTab, "일", dayX, y, false);
+        _chkMon = AddDayCheckBox(scheduleTab, Strings.Mon, dayX, y, true); dayX += 55;
+        _chkTue = AddDayCheckBox(scheduleTab, Strings.Tue, dayX, y, true); dayX += 55;
+        _chkWed = AddDayCheckBox(scheduleTab, Strings.Wed, dayX, y, true); dayX += 55;
+        _chkThu = AddDayCheckBox(scheduleTab, Strings.Thu, dayX, y, true); dayX += 55;
+        _chkFri = AddDayCheckBox(scheduleTab, Strings.Fri, dayX, y, true); dayX += 55;
+        _chkSat = AddDayCheckBox(scheduleTab, Strings.Sat, dayX, y, false); dayX += 55;
+        _chkSun = AddDayCheckBox(scheduleTab, Strings.Sun, dayX, y, false);
 
         y += 35;
 
         // Add/Remove buttons
-        _btnAddSchedule = new Button { Text = "추가", Location = new Point(20, y), Size = new Size(70, 30) };
+        _btnAddSchedule = new Button { Text = Strings.Add, Location = new Point(20, y), Size = new Size(70, 30) };
         _btnAddSchedule.Click += OnAddSchedule;
-        _btnToggleSchedule = new Button { Text = "켜기/끄기", Location = new Point(95, y), Size = new Size(80, 30) };
+        _btnToggleSchedule = new Button { Text = Strings.Toggle, Location = new Point(95, y), Size = new Size(80, 30) };
         _btnToggleSchedule.Click += OnToggleSchedule;
-        _btnRemoveSchedule = new Button { Text = "삭제", Location = new Point(180, y), Size = new Size(70, 30) };
+        _btnRemoveSchedule = new Button { Text = Strings.Remove, Location = new Point(180, y), Size = new Size(80, 30) };
         _btnRemoveSchedule.Click += OnRemoveSchedule;
         scheduleTab.Controls.AddRange(new Control[] { _btnAddSchedule, _btnToggleSchedule, _btnRemoveSchedule });
 
@@ -220,9 +241,56 @@ public class MainForm : Form
         {
             Location = new Point(20, y),
             Size = new Size(395, 260),
-            Font = new Font("맑은 고딕", 10F)
+            Font = new Font("Segoe UI", 10F)
         };
         scheduleTab.Controls.Add(_lstSchedules);
+    }
+
+    private void ApplyLanguage()
+    {
+        // Tabs
+        _tabControl.TabPages[0].Text = Strings.TabTimer;
+        _tabControl.TabPages[1].Text = Strings.TabSchedule;
+
+        // Timer tab
+        _btnLang.Text = Strings.LangToggle;
+        _rbCountdown.Text = Strings.Countdown;
+        _rbSpecificTime.Text = Strings.SpecificTime;
+        _lblHours.Text = Strings.Hours;
+        _lblMinutes.Text = Strings.Minutes;
+        _lblSeconds.Text = Strings.Seconds;
+        _lblAction.Text = Strings.Action;
+        _btnStart.Text = Strings.Start;
+        _btnStop.Text = Strings.Stop;
+
+        // Schedule tab
+        _lblSchTime.Text = Strings.Time;
+        _btnAddSchedule.Text = Strings.Add;
+        _btnToggleSchedule.Text = Strings.Toggle;
+        _btnRemoveSchedule.Text = Strings.Remove;
+        _chkMon.Text = Strings.Mon;
+        _chkTue.Text = Strings.Tue;
+        _chkWed.Text = Strings.Wed;
+        _chkThu.Text = Strings.Thu;
+        _chkFri.Text = Strings.Fri;
+        _chkSat.Text = Strings.Sat;
+        _chkSun.Text = Strings.Sun;
+
+        // Refresh combo boxes
+        RefreshComboBox(_cboAction);
+        RefreshComboBox(_cboSchAction);
+
+        // Refresh schedule list (day names change)
+        RefreshScheduleList();
+    }
+
+    private static void RefreshComboBox(ComboBox combo)
+    {
+        var selected = combo.SelectedIndex;
+        combo.Items.Clear();
+        foreach (PowerAction action in Enum.GetValues(typeof(PowerAction)))
+            combo.Items.Add(new ActionItem(action));
+        combo.SelectedIndex = selected;
     }
 
     private void SetupTimers()
@@ -261,14 +329,14 @@ public class MainForm : Form
             var total = TimeSpan.FromHours((double)_nudHours.Value)
                       + TimeSpan.FromMinutes((double)_nudMinutes.Value)
                       + TimeSpan.FromSeconds((double)_nudSeconds.Value);
-            if (total <= TimeSpan.Zero) { MessageBox.Show("시간을 입력하세요.", "알림"); return; }
+            if (total <= TimeSpan.Zero) { MessageBox.Show(Strings.MsgEnterTime, Strings.MsgNotice); return; }
             _totalDuration = total;
             _targetTime = DateTime.Now + total;
         }
         else
         {
             var target = _dtpDate.Value.Date + _dtpTime.Value.TimeOfDay;
-            if (target <= DateTime.Now) { MessageBox.Show("미래 시간을 선택하세요.", "알림"); return; }
+            if (target <= DateTime.Now) { MessageBox.Show(Strings.MsgFutureTime, Strings.MsgNotice); return; }
             _totalDuration = target - DateTime.Now;
             _targetTime = target;
         }
@@ -331,7 +399,7 @@ public class MainForm : Form
         if (_chkSat.Checked) days.Add(DayOfWeek.Saturday);
         if (_chkSun.Checked) days.Add(DayOfWeek.Sunday);
 
-        if (days.Count == 0) { MessageBox.Show("요일을 선택하세요.", "알림"); return; }
+        if (days.Count == 0) { MessageBox.Show(Strings.MsgSelectDay, Strings.MsgNotice); return; }
 
         _schedules.Add(new ScheduleEntry
         {
@@ -372,7 +440,7 @@ public class MainForm : Form
             Maximum = max,
             Value = value,
             TextAlign = HorizontalAlignment.Center,
-            Font = new Font("맑은 고딕", 12F)
+            Font = new Font("Segoe UI", 12F)
         };
     }
 

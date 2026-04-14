@@ -19,21 +19,11 @@ public class ScheduleEntry
     {
         get
         {
-            if (Days.Count == 7) return "매일";
+            if (Days.Count == 7) return Strings.Everyday;
             var names = new List<string>();
             foreach (var d in Days)
             {
-                names.Add(d switch
-                {
-                    DayOfWeek.Monday => "월",
-                    DayOfWeek.Tuesday => "화",
-                    DayOfWeek.Wednesday => "수",
-                    DayOfWeek.Thursday => "목",
-                    DayOfWeek.Friday => "금",
-                    DayOfWeek.Saturday => "토",
-                    DayOfWeek.Sunday => "일",
-                    _ => ""
-                });
+                names.Add(Strings.GetDayName(d));
             }
             return string.Join(", ", names);
         }

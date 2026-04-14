@@ -49,14 +49,5 @@ public static class ShutdownHelper
         }
     }
 
-    public static string GetDisplayName(PowerAction action) => action switch
-    {
-        PowerAction.Shutdown => "종료",
-        PowerAction.Restart => "재시작",
-        PowerAction.Sleep => "절전",
-        PowerAction.Hibernate => "최대 절전",
-        PowerAction.LogOff => "로그오프",
-        PowerAction.Lock => "잠금",
-        _ => action.ToString()
-    };
+    public static string GetDisplayName(PowerAction action) => Strings.GetActionName(action);
 }

@@ -21,7 +21,7 @@ Download `PcQuitTimer.exe` from the [Releases](../../releases) page.
 
 | Timer | Schedule |
 |-------|----------|
-| ![Timer](docs/timer.png) | ![Schedule](docs/schedule.png) |
+| ![Timer](docs/timer_en.png) | ![Schedule](docs/schedule_en.png) |
 
 ## Build
 
